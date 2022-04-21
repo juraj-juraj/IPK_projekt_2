@@ -12,9 +12,9 @@ Druhá možnosť je použiť Makefile v hlavnom adresári. Spustí sa pomocou pr
 
 ## Spustenie snifferu
 
-Použitie: ./ipk-sniffer [-i | --interface \<rozhranie\>] {-p | --port \<port_number\>} {[--tcp|-t] [--udp|-u] [--arp|-a] [--icmp|-c] } {-n | --count \<num\>}
+Použitie: ./ipk-sniffer {[-i | --interface \<rozhranie\>] {-p | --port \<port_number\>} {[--tcp|-t] [--udp|-u] [--arp|-a] [--icmp|-c] } {-n | --count \<num\>}} | [-b | --binary  <súbor>]
 
-​    -i alebo --interface \<rozhranie\>     	Udáva na kktorom rozhraní bude chceme odchytávať. Ak nie je parameter zadaný vôbec alebo chýba meno
+​    -i alebo --interface \<rozhranie\>     	Udáva na ktorom rozhraní bude chceme odchytávať. Ak nie je parameter zadaný vôbec alebo chýba meno
 ​                                           						    rozhrania, vypíšu sa všetky dostupné rozhrania
 ​    -p alebo --port \<port_number\>     	 Filtrovanie zachytávaných paketov podľa portu 
 ​    
@@ -27,6 +27,8 @@ Použitie: ./ipk-sniffer [-i | --interface \<rozhranie\>] {-p | --port \<port_nu
 ​    -c alebo --icmp                        			   Filter na zachytávanie icmp paketov
 
 ​    -n alebo --count \<num\>              		 Po koľkých zachytených paketoch sa má ukončiť odchytávanie paketov. Implicitne sa po jednom pakete ukonči 																	   program
+
+​	-b alebo --binary <súbor>					Načíta paket z binárneho súboru
 
 Program musí byť spúštaný s root oprávnením.
 
