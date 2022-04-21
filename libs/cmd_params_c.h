@@ -1,3 +1,12 @@
+/**
+ * @file cmd_params_c.h
+ * @author Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
+ * @brief Library with class to parse comand line parameters
+ * @version 1.0
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #pragma once
 
 #include <iostream>
@@ -21,6 +30,11 @@ const std::string ERR_FILTER_COMP =             "ERROR: couldn't compile filter 
 const std::string ERR_SET_FILTER =              "ERROR: couldn't apply filter\n";
 const std::string ERR_BIN_FILE =                "ERROR: binary file couldn't be opened\n";
 
+/**
+ * @brief Structure to store arguments from command line in one unit
+ * Cursor is index in argv array of what argment will be next to be processed
+ * 
+ */
 typedef struct arg_struct_t{
     char **argv;
     int argc;
@@ -30,7 +44,6 @@ typedef struct arg_struct_t{
 #define init_arg_struct(name, arg_v, arg_c) arg_struct_t name; name.argv = arg_v; name.argc = arg_c, name.cursor = 1;
 
 #define param_parse_fce(name) int(*name)(cmd_params_c*,arg_struct_t*)
-//#define option_info_t double_key_map<std::string,char>
 using option_info_t = double_key_map<std::string, u_char>;
 
 #define INTERFACE_FLAG  0b00000001

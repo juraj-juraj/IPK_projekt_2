@@ -1,3 +1,12 @@
+/**
+ * @file double_key_map.h
+ * @author Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
+ * @brief library implements double key map array, associative continer with two keys to one value
+ * @version 1.0
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #ifndef _DOUBLE_KEY_MAP_
 #define _DOUBLE_KEY_MAP_
 

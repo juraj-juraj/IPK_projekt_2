@@ -25,12 +25,7 @@ void cmd_params_c::set_interface(std::string if_name){
     this->interface = if_name;
 }
 
-void cmd_params_c::set_interface(char *if_name){
-    // TODO zmazat ak to pojde praradenim
-    // for (int i = 0; if_name[i]; i++)
-    // {
-    //     this->interface += if_name[i];
-    // }   
+void cmd_params_c::set_interface(char *if_name){   
     this->interface = if_name;         
 }
 

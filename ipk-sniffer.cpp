@@ -1,3 +1,12 @@
+/**
+ * @file ipk-sniffer.cpp
+ * @author Juraj Novosad (xnovos13@stud.fot.vutbr.cz)
+ * @brief Implementation of sniffer project
+ * @version 1.0
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <iostream>
 #include <pcap.h>
 #include <tuple>
@@ -20,7 +29,15 @@
 
 using namespace header_msgs;
 /* -----------------------------------------------------------------*/
-// parse arguments
+
+/**
+ * @brief Function to parse arguments, calls functions to correctly initialize all arguments
+ * 
+ * @param cmd_options class representing possible arguments
+ * @param arguments arguments from comand line wrapped in struct
+ * @param options double key map object which holds argumentss strings with their flags
+ * @return int 
+ */
 int parse_arguments(cmd_params_c *cmd_options, arg_struct_t *arguments, option_info_t &options){
     int retval = EXIT_SUCCESS;
     u_char flag = 0;
@@ -64,26 +81,40 @@ int parse_arguments(cmd_params_c *cmd_options, arg_struct_t *arguments, option_i
     return retval;
 }
 
-void construct_option_info(option_info_t *option_info){
-    option_info->insert(std::make_tuple("-i", "--interface",    INTERFACE_FLAG));
-    option_info->insert(std::make_tuple("-p", "--port",         PORT_FLAG));
-    option_info->insert(std::make_tuple("-t", "--tcp",          TCP_FLAG));
-    option_info->insert(std::make_tuple("-u", "--udp",          UDP_FLAG));
-    option_info->insert(std::make_tuple("-c", "--icmp",         ICMP_FLAG));
-    option_info->insert(std::make_tuple("-a", "--arp",          ARP_FLAG));
-    option_info->insert(std::make_tuple("-n", "--count",        N_FLAG));
-    option_info->insert(std::make_tuple("-b", "--binary",        B_FLAG));
+/**
+ * @brief Function to construct arguments and assign them respactive flag
+ * 
+ * @param option_info  double key array map, which is empty but initialized
+ */
+void construct_option_info(option_info_t &option_info){
+    option_info.insert(std::make_tuple("-i", "--interface",    INTERFACE_FLAG));
+    option_info.insert(std::make_tuple("-p", "--port",         PORT_FLAG));
+    option_info.insert(std::make_tuple("-t", "--tcp",          TCP_FLAG));
+    option_info.insert(std::make_tuple("-u", "--udp",          UDP_FLAG));
+    option_info.insert(std::make_tuple("-c", "--icmp",         ICMP_FLAG));
+    option_info.insert(std::make_tuple("-a", "--arp",          ARP_FLAG));
+    option_info.insert(std::make_tuple("-n", "--count",        N_FLAG));
+    option_info.insert(std::make_tuple("-b", "--binary",        B_FLAG));
 }   
 
 
 /* ----------------------------------------------------------------*/
-// Printing data about interfaces
+/**
+ * @brief prints address of a interface
+ * 
+ * @param socket 
+ */
 void _print_sockaddr(sockaddr *socket){
     if(socket == NULL) return;
     printf(SOCKADDR_MESSAGE.c_str(), (socket->sa_family == AF_INET6)? IPV6_NAME: IPV4_NAME, socket->sa_data);
     printf("\n");
 }
 
+/**
+ * @brief Print informations about interface such as address, netmask, broadcast address
+ * 
+ * @param if_addr struct with information about interface
+ */
 void _print_pcap_addr_t(pcap_addr_t *if_addr){
     if(if_addr == NULL) return;
     printf("    --------\n");
@@ -98,6 +129,12 @@ void _print_pcap_addr_t(pcap_addr_t *if_addr){
     _print_pcap_addr_t(if_addr->next);
 }
 
+/**
+ * @brief Prints verbose information about interface. 
+ * V at the end of name means verbose
+ * 
+ * @param interface 
+ */
 void _print_interface_v(pcap_if_t *interface){
     if(interface == NULL) return;
     printf(INTERFACE_MESSAGE.c_str(), interface->name, interface->description); 
@@ -106,12 +143,22 @@ void _print_interface_v(pcap_if_t *interface){
     _print_interface_v(interface->next);
 }
 
+/**
+ * @brief Prints only name of interface, simplified alternation of function _print_interface_v
+ * 
+ * @param interface 
+ */
 void _print_interface(pcap_if_t *interface){
     if(interface == NULL) return;
     print_line(interface->name);
     _print_interface(interface->next); 
 }
 
+/**
+ * @brief Function gets all interfaces available, them lets them print
+ * 
+ * @return int return value, whether it was succesfull
+ */
 int print_interfaces(){
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_if_t *interfaces;
@@ -126,7 +173,8 @@ int print_interfaces(){
 }
 
 //------------------------------
-//Printing frames
+// Printing frames
+// Next functions doesnt have their comment head, because name implies what they do
 
 void print_tcp(const u_char *body){
     struct tcphdr *tcp_head = (struct tcphdr *) body;
@@ -356,6 +404,13 @@ int print_arp(const u_char *body){
     return ARP_LEN;
 }
 
+/**
+ * @brief Prints raw data
+ * Formats them as seen in wireshark
+ * 
+ * @param packet raw packet data 
+ * @param len length of packet
+ */
 void print_raw_packet(const u_char *packet, int len){
     bool done = false;
     int packet_index = 0;
@@ -382,6 +437,13 @@ void print_raw_packet(const u_char *packet, int len){
     }
 }
 
+/**
+ * @brief Entry point when got packet and wants to decode it and print important informations
+ * 
+ * @param args Is not used, declared only because of protocol
+ * @param head Mainly source of timestamp
+ * @param body Raw data of packet
+ */
 void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *body){
     char time_buffer[200];
     char all_buffer[200];
@@ -423,6 +485,12 @@ void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *bo
     print_line("");
 }
 
+/**
+ * @brief Entry point when processing packet from file
+ * 
+ * @param cmd_options only gets path to binary file
+ * @return int mainly if reading file with packet was succesfull
+ */
 int process_binary_packet(cmd_params_c &cmd_options){
     const auto data_path = cmd_options.get_binary_path();
     std::ifstream input( data_path, std::ios::binary );
@@ -446,7 +514,7 @@ int main(int argc, char *argv[]){
     
     //print_interfaces(); 
     option_info_t option_info;
-    construct_option_info(&option_info);
+    construct_option_info(option_info);
     cmd_params_c cmd_options;
     init_arg_struct(arg_struct, argv, argc);
     retval = parse_arguments(&cmd_options, &arg_struct, option_info);

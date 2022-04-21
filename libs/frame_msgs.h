@@ -1,3 +1,12 @@
+/**
+ * @file frame_msgs.h
+ * @author Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
+ * @brief Constants and messages are defined here
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #pragma once
 
 #include <netinet/ether.h>
