@@ -1,5 +1,4 @@
 build/
-testovanie
 .vscode/
 temp/
 *.o
