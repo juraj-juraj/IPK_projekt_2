@@ -53,7 +53,7 @@ data_t: %s ";
     const std::string DST_PORT_MSG = "Dst port: ";
     const std::string SEQ_NUM_MSG = "Sequence number: ";
     const std::string ACK_NUM_MSG = "Ack number: ";
-    const std::string FLAGS_TCP_MSG = "Flags: 0x%02x%02x\n";
+    const std::string FLAGS_TCP_MSG = "Flags: 0x%1x%02x\n";
     const std::string UDP_LEN_MSG = "UDP frame length: ";
     const std::string FRAME_LEN_MSG = "Frame length: ";
     const std::string TTL_MSG = "Time to live: ";
@@ -74,6 +74,7 @@ data_t: %s ";
 
     const int OCTET_CONST = 4;
 
+    const std::string ARP_NAME = "ARP";
     const std::string IPV6_NAME = "IPV6";
     const std::string IPV4_NAME = "IPV4";
 
@@ -89,7 +90,7 @@ data_t: %s ";
     const std::string	ARPOP_NAK_MSG =	    "ARP NAK (10)";	        /* (ATM)ARP NAK.  */
 
     // ICMP messages
-    const std::string ICMPV6_MSG =             "ICMPv6 frame";
+    const std::string ICMPV6_MSG =              "Type: ICMPv6";
     const std::string ICMP_ECHOREPLY_MSG =		"Echo reply (0)";	            /* Echo Reply			*/
     const std::string ICMP_DEST_UNREACH_MSG =	"Destination unreachable (3)";	/* Destination Unreachable	*/
     const std::string ICMP_SOURCE_QUENCH_MSG =	"Source Quench (4)";	        /* Source Quench		*/

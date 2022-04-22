@@ -178,6 +178,7 @@ int print_interfaces(){
 
 void print_tcp(const u_char *body){
     struct tcphdr *tcp_head = (struct tcphdr *) body;
+    print_line(PROT_TCP_MSG);
     print_line(SRC_PORT_MSG + std::to_string(ntohs(tcp_head->th_sport)));
     print_line(DST_PORT_MSG  + std::to_string(ntohs(tcp_head->th_dport)));
     print_line(SEQ_NUM_MSG + std::to_string(htonl(tcp_head->th_seq)));
@@ -187,6 +188,7 @@ void print_tcp(const u_char *body){
 
 void print_udp(const u_char *body){
     struct udphdr *udp_head = (struct udphdr *) body;
+    print_line(PROT_UDP_MSG);
     print_line(SRC_PORT_MSG + std::to_string(ntohs(udp_head->uh_sport)));
     print_line(DST_PORT_MSG + std::to_string(ntohs(udp_head->uh_dport)));
     print_line(UDP_LEN_MSG + std::to_string(ntohs(udp_head->uh_ulen)));
@@ -194,6 +196,7 @@ void print_udp(const u_char *body){
 
 void print_icmp_v4(const u_char *body){
     struct icmphdr *icmp_head = (struct icmphdr *) body;
+    print_line(PROT_ICMP_MSG);
     print_line(SEQ_NUM_MSG + std::to_string(icmp_head->un.echo.sequence));
     std::cout << TYPE_MSG;
     switch(icmp_head->type){
@@ -288,7 +291,7 @@ void extension_hop(const u_char *body, uint8_t ip6_next){
             print_udp(body);
             break;
         //TODO for some reason icmp6 is wrongly defined
-        //case IPPROTO_ICMPV6:
+        case IPPROTO_ICMPV6:
         case 1:
             print_icmp_v6(body);
             break;
@@ -298,11 +301,12 @@ void extension_hop(const u_char *body, uint8_t ip6_next){
     }
 }
 
-int print_ipv4_frame(const u_char *body){
+void print_ipv4_frame(const u_char *body){
     char *ip_addr_readable;
     unsigned int header_length;
     struct ip *ip_head = (struct ip *) body;
 
+    print_line(TYPE_MSG + IPV4_NAME);
     print_line(FRAME_LEN_MSG + std::to_string(htons(ip_head->ip_len)));
     print_line(TTL_MSG + std::to_string(ip_head->ip_ttl));
     ip_addr_readable = inet_ntoa(ip_head->ip_src);
@@ -313,28 +317,25 @@ int print_ipv4_frame(const u_char *body){
     print_line(HEAD_LEN_MSG + std::to_string(header_length));
     switch(ip_head->ip_p){
         case IPPROTO_TCP:
-            print_line(PROT_TCP_MSG);
             print_tcp(body + header_length);
             break;
         case IPPROTO_UDP:
-            print_line(PROT_UDP_MSG);
             print_udp(body + header_length);
             break;
         case IPPROTO_ICMP:
-            print_line(PROT_ICMP_MSG);
             print_icmp_v4(body + header_length);
             break;
         default:
             print_line(PROT_UFO_MSG);
             break;
     }
-    return htons(ip_head->ip_len);
 }
 
-int print_ipv6_frame(const u_char *body){
+void print_ipv6_frame(const u_char *body){
     struct ip6_hdr *ip6_head = (struct ip6_hdr *) body;struct icmp6_hdr;
     char address[INET6_ADDRSTRLEN];
     
+    print_line(TYPE_MSG + IPV6_NAME);
     struct in6_addr raw_adresa = ip6_head->ip6_dst;
     inet_ntop(AF_INET6, (const void *) &(ip6_head->ip6_dst), address, INET6_ADDRSTRLEN);
     print_line(DST_IP_MSG + std::string(address));
@@ -344,14 +345,14 @@ int print_ipv6_frame(const u_char *body){
     print_line(TOTAL_LEN_MSG + std::to_string(ntohs(ip6_head->ip6_ctlun.ip6_un1.ip6_un1_plen)));
     extension_hop(body + IPV6_HEAD_LEN, ip6_head->ip6_ctlun.ip6_un1.ip6_un1_nxt);
 
-    return ntohs(ip6_head->ip6_ctlun.ip6_un1.ip6_un1_plen);
+    //return ntohs(ip6_head->ip6_ctlun.ip6_un1.ip6_un1_plen);
 }
 
-int print_arp(const u_char *body){
+void print_arp(const u_char *body){
     uint16_t prot_type;
     uint16_t opcode_type;
     struct ether_arp *arp_head = (struct ether_arp *) body;
-    
+    print_line(TYPE_MSG + ARP_NAME);
     prot_type = ntohs(arp_head->ea_hdr.ar_pro);
     std::cout << PROT_TYPE_MSG;
     switch(prot_type){
@@ -400,8 +401,6 @@ int print_arp(const u_char *body){
     print_line(ether_ntoa ((struct ether_addr *) arp_head->arp_tha));
     std::cout << TARGET_IP_MSG;
     print_ipv4_raw(arp_head->arp_tpa);
-
-    return ARP_LEN;
 }
 
 /**
@@ -469,19 +468,19 @@ void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *bo
     switch (host_ethertype)
     {
     case ETHERTYPE_ARP:
-        frame_len = print_arp(body + ETH_HLEN);
+        print_arp(body + ETH_HLEN);
         break;
     case ETHERTYPE_IP:
-        frame_len = print_ipv4_frame(body + ETH_HLEN);
+        print_ipv4_frame(body + ETH_HLEN);
         break;
     case ETHERTYPE_IPV6:
-        frame_len = print_ipv6_frame(body + ETH_HLEN);
+        print_ipv6_frame(body + ETH_HLEN);
         break;
     default:
         print_line(PROT_UFO_MSG);
         break;
     }
-    print_raw_packet(body, frame_len);
+    print_raw_packet(body, head->caplen);
     print_line("");
 }
 
@@ -501,7 +500,7 @@ int process_binary_packet(cmd_params_c &cmd_options){
 
     // copies all data into buffer
     std::vector<u_char> buffer(std::istreambuf_iterator<char>(input), {});
-    pcap_pkthdr time_header{{1000, 1000}, 0, 0};
+    pcap_pkthdr time_header{{1, 1}, (unsigned int)buffer.size(), 0};
 
     print_packet(NULL, &time_header, &buffer[0]);
     return EXIT_SUCCESS;
