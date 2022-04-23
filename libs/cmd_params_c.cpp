@@ -71,7 +71,7 @@ int cmd_params_c::setfilter(pcap_t *handle){
     if(this->param_is_set(PROTOCOL_MASK)){
         filter_exp += "(";
         if(this->param_is_set(ICMP_FLAG)){
-            filter_exp += "icmp";
+            filter_exp += "icmp || icmp6";
             this->unset_param(ICMP_FLAG);
             if(this->param_is_set(PROTOCOL_MASK)) filter_exp += " || ";
         }

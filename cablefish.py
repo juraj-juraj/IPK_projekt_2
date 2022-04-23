@@ -125,7 +125,7 @@ class option_bar_c:
         self.btn_interface_disc.grid(row=2, column=1, padx=3, pady=3)
         self.btn_interface_disc.bind("<Button>", self.bind_interfaces)
 
-        self.btn_start_sniff = tk.Button(master=self.frm_buttons, text = "Start_sniffing")
+        self.btn_start_sniff = tk.Button(master=self.frm_buttons, text = "Start sniffing")
         self.btn_start_sniff.grid(row=1, column=8, padx=3, pady=3)
         self.btn_start_sniff.bind("<Button>", self.bind_sniffing)
 
