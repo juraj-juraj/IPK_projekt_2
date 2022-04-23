@@ -61,4 +61,10 @@ Code: 0
 0x0050:  26 27 28 29 
 ```
 
- 
+ # Spustenie CableFish
+
+CableFish je grafická nadstavba nad snifferom.
+
+Musí byť spúštaná s právami `root` a preferuje sa spúštanie cez skript `run_cablefish.sh`. Ešte pred spustením musí byť program sniffer preložený a spustiteľný.
+
+Pri spustení sa otvorí okno. Ak chcete zistiť dostupné rozhrania, tlačítko `Interfaces` ich vypíše. Pred zachytávaním paketov je nutné špecifikovať rozhranie v `Interface` vstupe. Pomocou vstupov `Port` a `Count` sa definuje port na zachytávanie a koľko paketov zachytiť. Implicitne sa odpočúva na vśetkých portoch a jeden paket. Checkboxami sa filtrujú zachytené pakety. Ak nie je zaškrtnutý ani jeden, sú odchytávané všetky rovnako akoby boli zaškrtnuté všetky políčka.
