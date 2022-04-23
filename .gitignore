@@ -3,3 +3,5 @@ build/
 temp/
 *.o
 ipk-sniffer
+*.zip
+*.tgz
