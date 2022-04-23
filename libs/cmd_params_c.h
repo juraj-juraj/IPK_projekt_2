@@ -54,6 +54,7 @@ using option_info_t = double_key_map<std::string, u_char>;
 #define ARP_FLAG        0b00100000      
 #define N_FLAG          0b01000000      // count flag
 #define B_FLAG          0b10000000      // Binary flag
+#define ALL_PARAMS      0b11111111
 #define PROTOCOL_MASK (TCP_FLAG|UDP_FLAG|ICMP_FLAG|ARP_FLAG)
 
 class cmd_params_c{
@@ -72,6 +73,8 @@ class cmd_params_c{
         void set_flag(char mask);
 
         bool param_is_set(char mask);
+
+        void unset_param(char mask);
 
         void set_interface(std::string if_name);
 

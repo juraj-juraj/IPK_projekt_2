@@ -21,6 +21,10 @@ bool cmd_params_c::param_is_set(char mask){
     return ((this->param_flags & mask) != 0) ? true : false;
 }
 
+void cmd_params_c::unset_param(char mask){
+    this->param_flags -= mask;
+}
+
 void cmd_params_c::set_interface(std::string if_name){
     this->interface = if_name;
 }
@@ -64,14 +68,35 @@ int cmd_params_c::setfilter(pcap_t *handle){
         return EXIT_FAILURE;
     }
 
+    if(this->param_is_set(PROTOCOL_MASK)){
+        filter_exp += "(";
+        if(this->param_is_set(ICMP_FLAG)){
+            filter_exp += "icmp";
+            this->unset_param(ICMP_FLAG);
+            if(this->param_is_set(PROTOCOL_MASK)) filter_exp += " || ";
+        }
+        if(this->param_is_set(TCP_FLAG)){
+            filter_exp += "tcp";
+            this->unset_param(TCP_FLAG);
+            if(this->param_is_set(PROTOCOL_MASK)) filter_exp += " || ";
+        }
+        if(this->param_is_set(ARP_FLAG)){
+            filter_exp += "arp";
+            this->unset_param(ARP_FLAG);
+            if(this->param_is_set(PROTOCOL_MASK)) filter_exp += " || ";
+        }
+        if(this->param_is_set(UDP_FLAG)){
+            filter_exp += "udp";
+            this->unset_param(UDP_FLAG);
+        }
+        filter_exp += ")";
+        if(this->param_is_set(PORT_FLAG)) filter_exp += " && ";
+    }
+
     if(this->param_is_set(PORT_FLAG)){
         filter_exp += "port " + std::to_string(this->port) + " ";
     }
-    if(this->param_is_set(ICMP_FLAG)) filter_exp += "icmp ";
-    if(this->param_is_set(TCP_FLAG)) filter_exp += "tcp ";
-    if(this->param_is_set(ARP_FLAG)) filter_exp += "arp ";
-    if(this->param_is_set(UDP_FLAG)) filter_exp += "udp ";
-    
+
     //setting up filter
     if(filter_exp.length()){
         if(pcap_lookupnet(this->interface.c_str(), &ip_gate, &mask, errbuf) == PCAP_ERROR){
