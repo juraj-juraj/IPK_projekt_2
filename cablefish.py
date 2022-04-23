@@ -1,7 +1,5 @@
 import tkinter as tk
 import subprocess as sb
-from abc import ABC
-from typing import overload
 
 PROGRAM_NAME = "CableFish"
 WINDOW_SIZE = '800x600'
@@ -152,7 +150,7 @@ class option_bar_c:
             sniffer.set_param(PORT_MSG, self.ent_port.get())
         if(self.ent_count.get() != ""):
             sniffer.set_param(COUNT_MSG, self.ent_count.get())
-            
+
         for val in self.prot_vals:
             if(self.prot_vals[val].get() == True):
                 sniffer.set_param(val)
