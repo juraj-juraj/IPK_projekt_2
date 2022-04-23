@@ -1,6 +1,7 @@
 import tkinter as tk
 import subprocess as sb
 from abc import ABC
+from typing import overload
 
 PROGRAM_NAME = "CableFish"
 WINDOW_SIZE = '800x600'
@@ -22,11 +23,18 @@ def set_dict(dictionary_set, key, value):
 #     e.widget["text"] = message_container
 
 
-class main_window_c:
+class main_observer_c:
     def __init__(self) -> None:
         self.elements = []
         self.com_channel = ''
 
+    @property
+    def com_channel(self):
+        return self._com_channel
+    @com_channel.setter
+    def com_channel(self, value):
+        self._com_channel = value
+    
     def initialise(self, master, this_class) -> None:
         self.frm_master = this_class(master)
         self.frm_master.place(relheight=1, relwidth=1)
@@ -34,10 +42,10 @@ class main_window_c:
     def inject_element(self, element):
         self.elements.append(element(self.frm_master))
 
-    def invoke_action(self, msg):
-        list(map(lambda x: x.invoke_action(msg), self.elements))
+    def notify(self):
+        list(map(lambda x: x.notify(self.com_channel), self.elements))
 
-main_window = main_window_c()
+main_observer = main_observer_c()
 
 
 class sniffer_controller:
@@ -47,31 +55,37 @@ class sniffer_controller:
             raise Exception("Cannot instantiate more instances of sniffer controller")
         else:
             sniffer_controller.__instance = self
-            self.command = bin_dest
-            self.__command_restore = bin_dest
+            self.command = ["sudo", bin_dest]
+            self.__command_restore = self.command.copy()
             self.param_set = { TCP_MSG: False, UDP_MSG: False, ARP_MSG:False ,ICMP_MSG: False, IF_MSG: False, PORT_MSG: False}
     
     @staticmethod
-    def get_instance(bin = "./sniffer"): 
+    def get_instance(bin = "./ipk-sniffer"): 
         if sniffer_controller.__instance == None:
             sniffer_controller(bin)
         return sniffer_controller.__instance
     
-    def set_param(self, parameter, value=""):
+    def set_param(self, parameter:str, value: str ="") -> None:
         if(self.param_set.get(parameter, True) == False):
             self.param_set[parameter] = True
-            self.command += " "+ parameter + " " + str(value)
-
+            self.command.append(parameter)
+            if(value):
+                self.command.append(str(value))
+    
     def reset_command(self):
         for key in self.param_set:
             self.param_set[key] = False
-        self.command = self.__command_restore
+        self.command = self.__command_restore.copy()
 
     def execute(self):
         print(self.command)
-        with sb.Popen(self.command, stdout=sb.PIPE) as proc:
-            #main_window.com_channel = proc.stdout.read()
-            pass
+        try:
+            main_observer.com_channel = sb.check_output(self.command)
+        except:
+            main_observer.com_channel = "Error: undefined interface"
+        main_observer.notify()
+        print(main_observer.com_channel)
+        
 
 
 class option_bar_c:
@@ -119,8 +133,11 @@ class option_bar_c:
     def bind_sniffing(self, e):
         sniffer = sniffer_controller.get_instance()
         sniffer.reset_command()
+
         if(self.ent_interface.get() == ""):
-            print("set intreface first ")
+            main_observer.com_channel = "Set interface first"
+            main_observer.notify()
+            print("set interface first ")
             return
         sniffer.set_param(IF_MSG, self.ent_interface.get())
 
@@ -131,18 +148,24 @@ class option_bar_c:
                 sniffer.set_param(val)
         sniffer.execute()
 
-    def invoke_action(self, msg):
+    def notify(self, msg):
         pass
 
 
 class label_output_c:
     def __init__(self, master):
-        self.lbl_output = tk.Label(master = master, bg="white")
-        self.lbl_output.place(relheight=0.8, relwidth=0.96, relx=0.02, rely=0.18)
+        self.text_frm = tk.Frame(master=master, bg="white")
+        self.text_frm.place(relheight=0.8, relwidth=0.96, relx=0.02, rely=0.18)
+        self.widget_txt = tk.Text(master=self.text_frm)
+        self.widget_txt.pack(side=tk.LEFT, expand=True, fill="both")
+        self.lbl_scroll = tk.Scrollbar(master = self.text_frm, orient='vertical', command=self.widget_txt.yview)
+        self.widget_txt.config(yscrollcommand=self.lbl_scroll.set)
+        self.lbl_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.widget_txt.pack(side=tk.LEFT, expand=True, fill="both")
 
-    def invoke_action(self, msg):
-        self.lbl_output["text"] = msg
-
+    def notify(self, msg):
+        self.widget_txt.delete("1.0", tk.END)
+        self.widget_txt.insert(tk.END, msg)
 
 
 def main():
@@ -150,10 +173,10 @@ def main():
     root.title(PROGRAM_NAME)
     root.geometry(WINDOW_SIZE)
 
-    main_window.initialise(root, tk.Frame)
-    main_window.inject_element(option_bar_c)
-    main_window.inject_element(label_output_c)
-    # frm_main = tk.Frame(master = main_window)
+    main_observer.initialise(root, tk.Frame)
+    main_observer.inject_element(option_bar_c)
+    main_observer.inject_element(label_output_c)
+    # frm_main = tk.Frame(master = main_observer)
     # frm_main.place(relheight=1, relwidth=1)
 
     # option_bar = option_bar_c(frm_main)
