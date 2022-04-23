@@ -1,3 +1,11 @@
+#####################################################
+# Project: ipk-sniffer
+# File: CableFish.py
+# Simple UI to use ipk-sniffer utility
+# Author: Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
+#####################################################
+
+
 import tkinter as tk
 import subprocess as sb
 
@@ -14,13 +22,6 @@ PROTOCOL_LIST = (TCP_MSG, UDP_MSG, ARP_MSG, ICMP_MSG)
 
 def set_dict(dictionary_set, key, value):
     dictionary_set[key] = value
-
-# def print_to_label(e):
-#     print("je tu")
-#     print(e.widget.__dict__)
-
-#     e.widget["text"] = message_container
-
 
 class main_observer_c:
     def __init__(self) -> None:
@@ -47,22 +48,22 @@ class main_observer_c:
 main_observer = main_observer_c()
 
 
-class sniffer_controller:
+class executable_controller:
     __instance = None
     def __init__(self, bin_dest):
-        if(sniffer_controller.__instance != None):
+        if(executable_controller.__instance != None):
             raise Exception("Cannot instantiate more instances of sniffer controller")
         else:
-            sniffer_controller.__instance = self
+            executable_controller.__instance = self
             self.command = ["sudo", bin_dest]
             self.__command_restore = self.command.copy()
             self.param_set = { TCP_MSG: False, UDP_MSG: False, ARP_MSG:False ,ICMP_MSG: False, IF_MSG: False, PORT_MSG: False, COUNT_MSG: False}
     
     @staticmethod
     def get_instance(bin = "./ipk-sniffer"): 
-        if sniffer_controller.__instance == None:
-            sniffer_controller(bin)
-        return sniffer_controller.__instance
+        if executable_controller.__instance == None:
+            executable_controller(bin)
+        return executable_controller.__instance
     
     def set_param(self, parameter:str, value: str ="") -> None:
         if(self.param_set.get(parameter, True) == False):
@@ -130,13 +131,13 @@ class option_bar_c:
 
 
     def bind_interfaces(self, e):
-        sniffer = sniffer_controller.get_instance()
+        sniffer = executable_controller.get_instance()
         sniffer.reset_command()
         sniffer.execute()
         
 
     def bind_sniffing(self, e):
-        sniffer = sniffer_controller.get_instance()
+        sniffer = executable_controller.get_instance()
         sniffer.reset_command()
 
         if(self.ent_interface.get() == ""):
@@ -184,11 +185,6 @@ def main():
     main_observer.initialise(root, tk.Frame)
     main_observer.inject_element(option_bar_c)
     main_observer.inject_element(label_output_c)
-    # frm_main = tk.Frame(master = main_observer)
-    # frm_main.place(relheight=1, relwidth=1)
-
-    # option_bar = option_bar_c(frm_main)
-    # label_output = label_output_c(frm_main)
     
     root.resizable(True, True)
     root.mainloop()
