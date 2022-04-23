@@ -11,6 +11,7 @@ TCP_MSG = "--tcp"
 ARP_MSG = "--arp"
 ICMP_MSG = "--icmp"
 UDP_MSG = "--udp"
+COUNT_MSG = "-n"
 PROTOCOL_LIST = (TCP_MSG, UDP_MSG, ARP_MSG, ICMP_MSG)
 
 def set_dict(dictionary_set, key, value):
@@ -57,7 +58,7 @@ class sniffer_controller:
             sniffer_controller.__instance = self
             self.command = ["sudo", bin_dest]
             self.__command_restore = self.command.copy()
-            self.param_set = { TCP_MSG: False, UDP_MSG: False, ARP_MSG:False ,ICMP_MSG: False, IF_MSG: False, PORT_MSG: False}
+            self.param_set = { TCP_MSG: False, UDP_MSG: False, ARP_MSG:False ,ICMP_MSG: False, IF_MSG: False, PORT_MSG: False, COUNT_MSG: False}
     
     @staticmethod
     def get_instance(bin = "./ipk-sniffer"): 
@@ -107,12 +108,18 @@ class option_bar_c:
         
         self.ent_port = tk.Entry(master=self.frm_buttons, width = 10, bg="white", relief=tk.RAISED, borderwidth=3)
         self.ent_port.grid(row=1, column=4, padx=3, pady=3)
+
+        self.lbl_count = tk.Label(master = self.frm_buttons, text = "Count: ")
+        self.lbl_count.grid(row=1, column= 5, padx=3, pady=3)
+
+        self.ent_count = tk.Entry(master=self.frm_buttons, width = 10, bg="white", relief=tk.RAISED, borderwidth=3)
+        self.ent_count.grid(row=1, column=6, padx=3, pady=3)
         
         self.prot_vals = {}
         list(map(lambda key: set_dict(self.prot_vals, key, tk.IntVar()), PROTOCOL_LIST))
         for name_pair in enumerate(PROTOCOL_LIST):
             btn_prot_box = tk.Checkbutton(master=self.frm_buttons, text = name_pair[1], variable = self.prot_vals[name_pair[1]])
-            btn_prot_box.grid(row = 1, column=name_pair[0] + 5, padx=3, pady = 3)
+            btn_prot_box.grid(row = 2, column=name_pair[0] + 2, padx=3, pady = 3)
 
 
         self.btn_interface_disc = tk.Button(master=self.frm_buttons, text = "Interfaces")
@@ -120,7 +127,7 @@ class option_bar_c:
         self.btn_interface_disc.bind("<Button>", self.bind_interfaces)
 
         self.btn_start_sniff = tk.Button(master=self.frm_buttons, text = "Start_sniffing")
-        self.btn_start_sniff.grid(row=1, column=9, padx=3, pady=3)
+        self.btn_start_sniff.grid(row=1, column=8, padx=3, pady=3)
         self.btn_start_sniff.bind("<Button>", self.bind_sniffing)
 
 
@@ -143,6 +150,9 @@ class option_bar_c:
 
         if(self.ent_port.get() != ""):
             sniffer.set_param(PORT_MSG, self.ent_port.get())
+        if(self.ent_count.get() != ""):
+            sniffer.set_param(COUNT_MSG, self.ent_count.get())
+            
         for val in self.prot_vals:
             if(self.prot_vals[val].get() == True):
                 sniffer.set_param(val)
