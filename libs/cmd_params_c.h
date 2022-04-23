@@ -16,12 +16,15 @@
 #include <arpa/inet.h>
 #include <vector>
 #include <algorithm>
+#include <bitset>
 #include "double_key_map.h"
 #include "utils_fce.h"
 
 
 const int MIN_PORT = 1;
 const int MAX_PORT = 65365;
+const int FLAG_SIZE = 9;
+using param_t = std::bitset<9>;
 
 const std::string ERR_MISSING_ARG =             "ERROR: missing parameter\n";
 const std::string ERR_WRONG_COMBINATION =       "ERROR: cannot combine those options in one session \n";
@@ -59,7 +62,7 @@ using option_info_t = double_key_map<std::string, u_char>;
 
 class cmd_params_c{
     private:
-        char param_flags;
+        std::bitset<FLAG_SIZE> param_flags;
         std::string interface;
         std::string bin_data_path;
         int port;
@@ -68,13 +71,13 @@ class cmd_params_c{
     public:
         cmd_params_c();
 
-        int set_params(param_parse_fce(handle), arg_struct_t *arguments);
+        //int set_params(param_parse_fce(handle), arg_struct_t *arguments);
 
-        void set_flag(char mask);
+        void set_flag(param_t mask);
 
-        bool param_is_set(char mask);
+        bool param_is_set(param_t mask);
 
-        void unset_param(char mask);
+        void unset_param(param_t mask);
 
         void set_interface(std::string if_name);
 

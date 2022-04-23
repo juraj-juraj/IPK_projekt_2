@@ -1,3 +1,12 @@
+/**
+ * @file utils_fce.cpp
+ * @author Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
+ * @brief Utilities functions to make life easier
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include "utils_fce.h"
 
 

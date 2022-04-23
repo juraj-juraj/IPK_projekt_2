@@ -336,7 +336,6 @@ void print_ipv6_frame(const u_char *body){
     char address[INET6_ADDRSTRLEN];
     
     print_line(TYPE_MSG + IPV6_NAME);
-    struct in6_addr raw_adresa = ip6_head->ip6_dst;
     inet_ntop(AF_INET6, (const void *) &(ip6_head->ip6_dst), address, INET6_ADDRSTRLEN);
     print_line(DST_IP_MSG + std::string(address));
     inet_ntop(AF_INET6, (const void *) &(ip6_head->ip6_src), address, INET6_ADDRSTRLEN);
@@ -345,7 +344,6 @@ void print_ipv6_frame(const u_char *body){
     print_line(TOTAL_LEN_MSG + std::to_string(ntohs(ip6_head->ip6_ctlun.ip6_un1.ip6_un1_plen)));
     extension_hop(body + IPV6_HEAD_LEN, ip6_head->ip6_ctlun.ip6_un1.ip6_un1_nxt);
 
-    //return ntohs(ip6_head->ip6_ctlun.ip6_un1.ip6_un1_plen);
 }
 
 void print_arp(const u_char *body){
@@ -443,12 +441,11 @@ void print_raw_packet(const u_char *packet, int len){
  * @param head Mainly source of timestamp
  * @param body Raw data of packet
  */
-void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *body){
+void print_packet(u_char *args __attribute__((unused)), const struct pcap_pkthdr *head, const u_char *body){
     const int buffer_size = 300;
     char time_buffer[buffer_size];
     char all_buffer[buffer_size];
     char *temp_mac;
-    int frame_len = 0;
     uint16_t host_ethertype;
     struct ether_header *ether_head = (struct ether_header *) body;
 

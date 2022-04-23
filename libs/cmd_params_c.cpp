@@ -1,3 +1,12 @@
+/**
+ * @file cmd_params_c.cpp
+ * @author Juraj Novosad (xnovos13@stud.fot.vutbr.cz)
+ * @brief Definition of class parsing commadn line arguments
+ * @version 1.0
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include "cmd_params_c.h"
 
 
@@ -9,20 +18,20 @@ cmd_params_c::cmd_params_c(){
     this->sniff_count = 1;
 }
 
-int cmd_params_c::set_params(param_parse_fce(handle), arg_struct_t *arguments){
-    return handle(this, arguments);
-}
+// int cmd_params_c::set_params(param_parse_fce(handle), arg_struct_t *arguments){
+//     return handle(this, arguments);
+// }
 
-void cmd_params_c::set_flag(char mask){
+void cmd_params_c::set_flag(param_t mask){
     this->param_flags = this->param_flags | mask;
 }
 
-bool cmd_params_c::param_is_set(char mask){
+bool cmd_params_c::param_is_set(param_t mask){
     return ((this->param_flags & mask) != 0) ? true : false;
 }
 
-void cmd_params_c::unset_param(char mask){
-    this->param_flags -= mask;
+void cmd_params_c::unset_param(param_t mask){
+    this->param_flags ^= mask;
 }
 
 void cmd_params_c::set_interface(std::string if_name){
@@ -117,7 +126,7 @@ int cmd_params_c::setfilter(pcap_t *handle){
 }
 
 void cmd_params_c::print_out(){
-    std::cout << "param flagy: " << (int) this->param_flags << " | interface: " <<  this->interface \
+    std::cout << "param flagy: " << this->param_flags.to_string() << " | interface: " <<  this->interface \
     << " | port:" << this->port << " | sniff_count: " << this->sniff_count << std::endl;
 }
 
@@ -150,7 +159,7 @@ int port_init(cmd_params_c *params, arg_struct_t *arguments){
     arguments->cursor++;
     int port_number =std::stoi(arguments->argv[arguments->cursor]);
     if(!in_between(port_number, MAX_PORT, MIN_PORT)){
-        ERR_OUT_OF_RANGE;
+        stderr_line(ERR_OUT_OF_RANGE);
         return EXIT_FAILURE;
     }
     params->set_port(port_number);

@@ -1,7 +1,7 @@
 /**
  * @file utils_fce.h
  * @author Juraj Novosad (xnovos13@stud.fit.vutbr.cz)
- * @brief Utility functions to make life easier
+ * @brief Utilities functions to make life easier
  * @version 0.1
  * 
  * @copyright Copyright (c) 2022
