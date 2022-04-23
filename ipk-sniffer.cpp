@@ -444,8 +444,9 @@ void print_raw_packet(const u_char *packet, int len){
  * @param body Raw data of packet
  */
 void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *body){
-    char time_buffer[200];
-    char all_buffer[200];
+    const int buffer_size = 300;
+    char time_buffer[buffer_size];
+    char all_buffer[buffer_size];
     char *temp_mac;
     int frame_len = 0;
     uint16_t host_ethertype;
@@ -454,8 +455,13 @@ void print_packet(u_char *args, const struct pcap_pkthdr *head, const u_char *bo
     //printing time begin
     time_t time_sec = head->ts.tv_sec;
     struct tm *packet_time = localtime(&time_sec);
-    strftime(time_buffer, 200, "Timestamp: %FT%X", packet_time);
-    snprintf(all_buffer, 200, "%s.%06ld+%02ld:00", time_buffer, head->ts.tv_usec, packet_time->tm_gmtoff/3600);
+    // strftime(time_buffer, buffer_size, "Timestamp: %FT%T%z", packet_time);
+    // int ret = snprintf(all_buffer, buffer_size, "%s.%06ld+%02ld:00", time_buffer, head->ts.tv_usec, packet_time->tm_gmtoff/3600);
+    
+    strftime(time_buffer, buffer_size, "Timestamp: %FT%X", packet_time);
+    int ret = snprintf(all_buffer, buffer_size, "%s.%06ld+%02ld:00", time_buffer, head->ts.tv_usec, packet_time->tm_gmtoff/3600);
+    if(ret < 0) return;
+    
     std::cout << all_buffer << std::endl;
     // printing time end
 
@@ -499,6 +505,7 @@ int process_binary_packet(cmd_params_c &cmd_options){
     }
 
     // copies all data into buffer
+    // Taken from https://stackoverflow.com/questions/5420317/reading-and-writing-binary-file
     std::vector<u_char> buffer(std::istreambuf_iterator<char>(input), {});
     pcap_pkthdr time_header{{1, 1}, (unsigned int)buffer.size(), 0};
 
