@@ -20,7 +20,7 @@ ${PROG}: ${PROG}.o ${LIB_PATH}${CMD_PARAMS}.o ${LIB_PATH}${UTILS_FCE}.o
 #${UTILS_FCE}.o: ${LIB_PATH}${UTILS_FCE}.cpp ${LIB_PATH}${UTILS_FCE}
 
 zip: $(FILES)
-	tar -czf $(NAME).tgz $(FILES)
+	tar -cvf $(NAME).tar $(FILES)
 
 clean:
 	rm -f ${PROG} *.o ${LIB_PATH}*.o  ${NAME}.tgz
