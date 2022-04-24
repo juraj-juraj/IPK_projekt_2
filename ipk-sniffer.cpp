@@ -452,9 +452,6 @@ void print_packet(u_char *args __attribute__((unused)), const struct pcap_pkthdr
     //printing time begin
     time_t time_sec = head->ts.tv_sec;
     struct tm *packet_time = localtime(&time_sec);
-    // strftime(time_buffer, buffer_size, "Timestamp: %FT%T%z", packet_time);
-    // int ret = snprintf(all_buffer, buffer_size, "%s.%06ld+%02ld:00", time_buffer, head->ts.tv_usec, packet_time->tm_gmtoff/3600);
-    
     strftime(time_buffer, buffer_size, "Timestamp: %FT%X", packet_time);
     int ret = snprintf(all_buffer, buffer_size, "%s.%06ld+%02ld:00", time_buffer, head->ts.tv_usec, packet_time->tm_gmtoff/3600);
     if(ret < 0) return;
@@ -532,29 +529,15 @@ int main(int argc, char *argv[]){
     else{
         //set up sniff handle
         sniff_handle = pcap_open_live(str_to_char_arr(cmd_options.get_interface()), BUFSIZ, 1, 1000, errbuf);
-        //sniff_handle = pcap_create(str_to_char_arr(cmd_options.get_interface()), errbuf);
         if(sniff_handle == NULL){
             std::cout << errbuf << std::endl;
             return EXIT_FAILURE;
         }
 
-        // if(pcap_set_promisc(sniff_handle, 1)){
-        //     stderr_line(ERROR_ACTIVATE_PROMISC);
-        //     return PCAP_ERROR_ACTIVATED;
-        // }
-
-        // if((retval = pcap_activate(sniff_handle))){
-        //     stderr_line(ERROR_ACTIVATE_PCAP);
-        //     pcap_geterr(sniff_handle);
-        //     pcap_close(sniff_handle);
-        //     return retval;
-        // }
         //set up filter
         if(cmd_options.setfilter(sniff_handle)) return EXIT_FAILURE;
         pcap_loop(sniff_handle, cmd_options.get_sniff_count(), print_packet, NULL);
-        pcap_close(sniff_handle);    
-
-
+        pcap_close(sniff_handle); 
     }
 
     return retval;

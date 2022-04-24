@@ -52,7 +52,7 @@ const HTML_HEAD = "
    </style>
   </head>
   <body>
-   <header><h3>IPP tester</h3></header>\n";
+   <header><h3>IPK tester</h3></header>\n";
 
 
 
