@@ -6,6 +6,7 @@ Dst IP: 82b4:487a:8647:6cc1:5a25:7300:c4eb:44ae
 Src IP: 96b5:7525:7300:937c:7e9a:81ac:144c:f3d1
 Hop limit: 19
 Total length: 54016
+Protocol: tcp
 Src port: 7380
 Dst port: 49922
 Sequence number: 752206817

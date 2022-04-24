@@ -6,6 +6,7 @@ Dst IP: 9bf3:9958:c4e9:f16a:163e:71be:b6f5:adfb
 Src IP: b277:2978:2573:1d:cf52:50f:ae84:dbcd
 Hop limit: 86
 Total length: 22836
+Protocol: udp
 Src port: 42961
 Dst port: 33860
 UDP frame length: 17373

@@ -6,6 +6,7 @@ Dst IP: 2001:4f8:3:d::61
 Src IP: 2607:f2c0:f00f:b001::face:b00c
 Hop limit: 255
 Total length: 84
+Protocol: udp
 Src port: 4342
 Dst port: 4342
 UDP frame length: 84
